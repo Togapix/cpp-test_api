@@ -1,0 +1,2 @@
+To build the project with Ninja, VS Code need to be opened from "x64 Native Tools Command Prompt for VS 2022".
+Ninja must be installed on the computer and then, the .exe folder path must be added in the environment variable PATH.

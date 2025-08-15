@@ -2,12 +2,13 @@
   "version": 2,
   "configurePresets": [
     {
-      "name": "vs2022",
-      "generator": "Visual Studio 17 2022",
+      "name": "ninjaa",
+      "generator": "Ninja",
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
         "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-        "VCPKG_TARGET_TRIPLET": "x64-windows"
+        "VCPKG_TARGET_TRIPLET": "x64-windows",
+        "CMAKE_BUILD_TYPE": "Debug"
       }
     }
   ]
