@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "configurePresets": [
+    {
+      "name": "default",
+      "inherits": "ninjaa",
+      "environment": {
+        "VCPKG_ROOT": "C:\\Users\\tomst\\source\\repos\\vcpkg"
+      }
+    }
+  ]
+}
