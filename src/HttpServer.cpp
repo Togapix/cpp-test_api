@@ -70,9 +70,20 @@ void HttpServer::handle_post(http_request message)
     ucout << U("Post request has been received.") << std::endl;
     ucout << U("Detail:") << std::endl;
     ucout <<  message.to_string() << std::endl;
-    
 
-    message.reply(status_codes::OK, U("TEMP JSON POST"));
+    utility::string_t value;
+    utility::string_t* value_ptr = &value;
+    
+    message.extract_json()
+        .then([this, message, value_ptr](json::value newValue)
+        {
+            ucout << "First Name : " << newValue[U("FirstName")] << std::endl;
+            ucout << "Last Name : " << newValue[U("LastName")] << std::endl;
+            *value_ptr = newValue.serialize();
+        }
+    ).wait();
+
+    message.reply(status_codes::OK, *value_ptr);
 
     return;
 };
