@@ -92,6 +92,17 @@
         "xtr1common": "cpp",
         "xtree": "cpp",
         "xutility": "cpp",
-        "*.dat": "cpp"
+        "*.dat": "cpp",
+        "cfenv": "cpp",
+        "cinttypes": "cpp",
+        "codecvt": "cpp",
+        "csetjmp": "cpp",
+        "csignal": "cpp",
+        "resumable": "cpp",
+        "future": "cpp",
+        "ranges": "cpp",
+        "regex": "cpp",
+        "scoped_allocator": "cpp",
+        "unordered_set": "cpp"
     }
 }
