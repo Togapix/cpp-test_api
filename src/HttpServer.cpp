@@ -94,8 +94,37 @@ void HttpServer::handle_put(http_request message)
     ucout << U("Detail:") << std::endl;
     ucout <<  message.to_string() << std::endl;
     
+    std::vector<utility::string_t> paths = http::uri::split_path(http::uri::decode(message.relative_uri().path()));
 
-    message.reply(status_codes::OK, U("TEMP JSON PUT"));
+    int idToEdit;
+
+    if (paths.empty())
+    {
+        message.reply(status_codes::BadGateway, U("Bad Gateway."));
+    }
+        
+    try
+    {
+        idToEdit = std::stoi(paths.back());
+    }
+    catch(const std::exception& e)
+    {
+        message.reply(status_codes::BadRequest, U("Received bad request."));
+    }
+
+    utility::string_t value;
+    utility::string_t* value_ptr = &value;
+
+    message.extract_json()
+        .then([this, message, value_ptr](json::value newValue)
+        {
+            ucout << "First Name : " << newValue[U("FirstName")] << std::endl;
+            ucout << "Last Name : " << newValue[U("LastName")] << std::endl;
+            *value_ptr = newValue.serialize();
+        }
+    ).wait();
+
+    message.reply(status_codes::OK, *value_ptr);
 
     return;
 };

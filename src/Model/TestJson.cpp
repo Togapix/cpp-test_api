@@ -11,6 +11,7 @@ utility::string_t TestJson::GetValues()
     #pragma region Value1
     json::value tempValue1 = json::value::object();
 
+    tempValue1[U("Id")] = json::value::number(1);
     tempValue1[U("LastName")] = json::value::string(U("Skywalker"));
     tempValue1[U("FirstName")] = json::value::string(U("Anakin"));
 
@@ -24,6 +25,7 @@ utility::string_t TestJson::GetValues()
     #pragma region Value2
     json::value tempValue2 = json::value::object();
 
+    tempValue1[U("Id")] = json::value::number(2);
     tempValue2[U("LastName")] = json::value::string(U("Kenobi"));
     tempValue2[U("FirstName")] = json::value::string(U("Obi-Wan"));
 
