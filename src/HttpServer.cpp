@@ -16,6 +16,7 @@ using namespace http;
 // using namespace http::experimental::listener;
 
 #include "HttpServer.h"
+#include "Model/TestJson.h"
 
 
 
@@ -55,7 +56,11 @@ void HttpServer::handle_get(http_request message)
     // useless line
     std::vector<utility::string_t> paths = http::uri::split_path(http::uri::decode(message.relative_uri().path()));
 
-    message.reply(status_codes::OK, U("TEMP JSON GET"));
+    TestJson dataManager;
+
+    utility::string_t data = dataManager.GetValues();
+
+    message.reply(status_codes::OK, data);
 
     return;
 };
