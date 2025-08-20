@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-#include "src/HttpServer.cpp"
+#include "src/HttpServer.h"
 
 using namespace std;
 using namespace web;
