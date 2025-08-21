@@ -16,7 +16,6 @@ using namespace http;
 // using namespace http::experimental::listener;
 
 #include "HttpServer.h"
-#include "Model/TestJson.h"
 
 
 
@@ -47,6 +46,7 @@ void HttpServer::handle_error(pplx::task<void>& t)
     }
 }
 
+
 void HttpServer::handle_get(http_request message)
 {
     ucout << U("Get request has been received.") << std::endl;
@@ -56,8 +56,6 @@ void HttpServer::handle_get(http_request message)
     // useless line
     std::vector<utility::string_t> paths = http::uri::split_path(http::uri::decode(message.relative_uri().path()));
 
-    TestJson dataManager;
-
     utility::string_t data = dataManager.GetValues();
 
     message.reply(status_codes::OK, data);
@@ -65,28 +63,32 @@ void HttpServer::handle_get(http_request message)
     return;
 };
 
+
 void HttpServer::handle_post(http_request message)
 {
     ucout << U("Post request has been received.") << std::endl;
     ucout << U("Detail:") << std::endl;
     ucout <<  message.to_string() << std::endl;
 
-    utility::string_t value;
-    utility::string_t* value_ptr = &value;
+    json::value value;
+    json::value* value_ptr = &value;
     
     message.extract_json()
-        .then([this, message, value_ptr](json::value newValue)
+        .then([value_ptr](json::value newValue)
         {
             ucout << "First Name : " << newValue[U("FirstName")] << std::endl;
             ucout << "Last Name : " << newValue[U("LastName")] << std::endl;
-            *value_ptr = newValue.serialize();
+            *value_ptr = newValue;
         }
     ).wait();
 
-    message.reply(status_codes::OK, *value_ptr);
+    dataManager.AddValue(value_ptr).wait();
+
+    message.reply(status_codes::OK, (*value_ptr).serialize());
 
     return;
 };
+
 
 void HttpServer::handle_put(http_request message)
 {
@@ -97,6 +99,7 @@ void HttpServer::handle_put(http_request message)
     std::vector<utility::string_t> paths = http::uri::split_path(http::uri::decode(message.relative_uri().path()));
 
     int idToEdit;
+    int* idToEdit_ptr = &idToEdit;
 
     if (paths.empty())
     {
@@ -109,25 +112,36 @@ void HttpServer::handle_put(http_request message)
     }
     catch(const std::exception& e)
     {
+        std::cerr << e.what() << '\n';
         message.reply(status_codes::BadRequest, U("Received bad request."));
     }
 
-    utility::string_t value;
-    utility::string_t* value_ptr = &value;
+    json::value value;
+    json::value* value_ptr = &value;
 
     message.extract_json()
         .then([this, message, value_ptr](json::value newValue)
         {
             ucout << "First Name : " << newValue[U("FirstName")] << std::endl;
             ucout << "Last Name : " << newValue[U("LastName")] << std::endl;
-            *value_ptr = newValue.serialize();
+            *value_ptr = newValue;
         }
     ).wait();
 
-    message.reply(status_codes::OK, *value_ptr);
+    try
+    {
+        dataManager.EditValue(value_ptr, idToEdit_ptr).wait();
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+        message.reply(status_codes::BadRequest, U("Received bad request."));
+    }
 
+    message.reply(status_codes::OK, *value_ptr);
     return;
 };
+
 
 void HttpServer::handle_delete(http_request message)
 {
@@ -135,8 +149,42 @@ void HttpServer::handle_delete(http_request message)
     ucout << U("Detail:") << std::endl;
     ucout <<  message.to_string() << std::endl;
     
+    std::vector<utility::string_t> paths = http::uri::split_path(http::uri::decode(message.relative_uri().path()));
 
-    message.reply(status_codes::OK, U("TEMP JSON DELETE"));
+    int idToDelete;
+
+    if (paths.empty())
+    {
+        message.reply(status_codes::BadGateway, U("Bad Gateway."));
+    }
+        
+    try
+    {
+        idToDelete = std::stoi(paths.back());
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+        message.reply(status_codes::BadRequest, U("Received bad request."));
+    }
+
+    utility::string_t deletedValue;
+    try
+    {
+        dataManager.DeleteValue(idToDelete)
+        .then([&deletedValue](utility::string_t value)
+            {
+                deletedValue = value;
+            }
+        )
+        .wait();
+    }
+    catch(const std::invalid_argument& e)
+    {
+        message.reply(status_codes::BadRequest, e.what());
+    }
+    
+    message.reply(status_codes::OK, deletedValue);
 
     return;
 };

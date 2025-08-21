@@ -1,4 +1,5 @@
 #include "cpprest/http_listener.h"
+#include "Model/TestJson.h"
 
 using namespace web;
 using namespace http;
@@ -13,6 +14,7 @@ private:
     void handle_delete(http_request message);
     void handle_error(pplx::task<void>& t);
     http_listener m_listener;
+    TestJson dataManager;
 
 public:
     HttpServer(utility::string_t url);
